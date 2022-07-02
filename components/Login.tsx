@@ -6,14 +6,64 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  useToast,
   VStack,
 } from '@chakra-ui/react'
+
+import axios from 'axios'
+import { useRouter } from 'next/router'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const loginHandler = () => {}
+
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const toast = useToast()
+  const loginHandler = async () => {
+    setLoading(true)
+    if (!email || !password) {
+      toast({
+        title: 'Please fill all the fields',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      })
+      setLoading(false)
+      return
+    }
+
+    const loginInfo = {
+      email,
+      password,
+    }
+    try {
+      const { data } = await axios.post(
+        'http://localhost:8000/api/login',
+        loginInfo
+      )
+      toast({
+        title: 'Logged in successfully',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      })
+      localStorage.setItem('chatUserInfo', JSON.stringify(data))
+      setLoading(false)
+      router.push('/chats')
+    } catch (e: any) {
+      console.log(e)
+      toast({
+        title: e.response.data,
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      })
+      setLoading(false)
+    }
+  }
   return (
     <VStack spacing="5px" color="black">
       <FormControl id="email" isRequired>
@@ -52,6 +102,7 @@ const Login = () => {
         colorScheme="red"
         w="full"
         mt="15px"
+        disabled={loading}
         onClick={() => {
           setEmail('guest@example.com')
           setPassword('123456')
