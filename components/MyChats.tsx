@@ -1,15 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { ChatContext } from '../Context/ChatProvider'
+import React, { useContext, useEffect } from 'react'
+import { ChatContext, IUser } from '../Context/ChatProvider'
 import { Box, Button, Stack, useToast, Text } from '@chakra-ui/react'
 import axios from 'axios'
 import { AddIcon } from '@chakra-ui/icons'
 import { getSender } from '../utils/getSender'
+import GroupChatModal from './GroupChatModal'
 
 const MyChats = () => {
   const userCtx = useContext(ChatContext)
-  const { user, selectedChat, setSelectedChat } = userCtx
+  const { user, selectedChat, setSelectedChat, chats, setChats } = userCtx
   const toast = useToast()
-  const [chats, setChats] = useState<any>([])
 
   useEffect(() => {
     if (!user) {
@@ -64,12 +64,14 @@ const MyChats = () => {
         alignItems="center"
       >
         My Chats
-        <Button
-          fontSize={{ base: '17px', md: '10px', lg: '17px' }}
-          rightIcon={<AddIcon />}
-        >
-          New Group Chat
-        </Button>
+        <GroupChatModal>
+          <Button
+            fontSize={{ base: '17px', md: '10px', lg: '17px' }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModal>
       </Box>
       <Box
         display="flex"
@@ -95,7 +97,7 @@ const MyChats = () => {
               >
                 <Text>
                   {!chat.isGroupChat
-                    ? getSender(user, chat.users)
+                    ? getSender(user as IUser, chat && chat.users)
                     : chat.chatName}
                 </Text>
               </Box>

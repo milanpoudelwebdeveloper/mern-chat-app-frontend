@@ -38,8 +38,6 @@ const SideDrawer = () => {
 
   const toast = useToast()
 
-  console.log(searchResult)
-
   const userCtx = useContext(ChatContext)
 
   const { user, logOut, setSelectedChat } = userCtx
@@ -169,7 +167,7 @@ const SideDrawer = () => {
                 searchResult.map((user: any) => (
                   <UserListItem
                     user={user}
-                    openChat={() => openChat(user._id)}
+                    operation={() => openChat(user._id)}
                     key={user._id}
                   />
                 ))}

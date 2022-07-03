@@ -4,14 +4,14 @@ import { IUser } from '../Context/ChatProvider'
 
 interface props {
   user: IUser
-  openChat: () => void
+  operation: () => void
 }
 
-const UserListItem: React.FC<props> = ({ user, openChat }) => {
+const UserListItem: React.FC<props> = ({ user, operation }) => {
   const { name, email, pic } = user
   return (
     <Box
-      onClick={openChat}
+      onClick={operation}
       cursor="pointer"
       bg="#E8E8E8"
       _hover={{ background: '#38B2AC' }}
