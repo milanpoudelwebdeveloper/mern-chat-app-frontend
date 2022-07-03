@@ -25,6 +25,8 @@ import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import { ChatContext, IUser } from '../Context/ChatProvider'
 import ProfileModal from './ProfileModal'
+import SearchLoading from './SearchLoading'
+import UserListItem from './UserListItem'
 
 const SideDrawer = () => {
   const [search, setSearch] = useState('')
@@ -135,6 +137,15 @@ const SideDrawer = () => {
                 />
                 <Button onClick={handleSearch}>Go</Button>
               </Box>
+              {loading && <SearchLoading />}
+              {searchResult.length > 0 &&
+                searchResult.map((user: any) => (
+                  <UserListItem
+                    user={user}
+                    openChat={() => {}}
+                    key={user._id}
+                  />
+                ))}
             </DrawerBody>
 
             <DrawerFooter>
