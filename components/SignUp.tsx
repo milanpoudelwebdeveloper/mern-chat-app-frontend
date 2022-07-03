@@ -7,11 +7,12 @@ import {
   InputRightElement,
   VStack,
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useToast } from '@chakra-ui/react'
 import axios from 'axios'
 import Resizer from 'react-image-file-resizer'
 import { useRouter } from 'next/router'
+import { ChatContext } from '../Context/ChatProvider'
 
 const SignUp = () => {
   const [name, setName] = useState('')
@@ -23,6 +24,8 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false)
   const toast = useToast()
   const router = useRouter()
+
+  const { login } = useContext(ChatContext)
 
   const postPic = async (file: any) => {
     console.log('file is', file)
@@ -98,6 +101,7 @@ const SignUp = () => {
       )
       if (data) {
         localStorage.setItem('chatUserInfo', JSON.stringify(data))
+        login(data)
         router.push('/chats')
       }
       setLoading(false)

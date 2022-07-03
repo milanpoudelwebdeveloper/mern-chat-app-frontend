@@ -21,7 +21,7 @@ const SideDrawer = () => {
   const [loading, setLoading] = useState(false)
   const [loadingChat, setLoadingChat] = useState(false)
 
-  console.log(search, searchResult, loading, loadingChat)
+  console.log(search, searchResult, loadingChat, loading)
 
   console.log(setSearch, setSearchResult, setLoading, setLoadingChat)
 
@@ -64,7 +64,7 @@ const SideDrawer = () => {
                 <MenuItem>My Profile</MenuItem>
               </ProfileModal>
               <MenuDivider />
-              <MenuItem onClick={logOut}>Log out</MenuItem>
+              <MenuItem onClick={() => logOut()}>Log out</MenuItem>
             </MenuList>
           </Menu>
         </Box>

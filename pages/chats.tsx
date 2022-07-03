@@ -1,7 +1,6 @@
 import { Box } from '@chakra-ui/react'
 import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import ChatBox from '../components/ChatBox'
 import MyChats from '../components/MyChats'
 import SideDrawer from '../components/SideDrawer'
@@ -9,15 +8,7 @@ import { ChatContext } from '../Context/ChatProvider'
 
 const Chats: NextPage = () => {
   const userCtx = useContext(ChatContext)
-  const { user, isLoggedIn } = userCtx
-
-  const router = useRouter()
-
-  useEffect(() => {
-    if (!isLoggedIn) {
-      router.push('/')
-    }
-  }, [isLoggedIn])
+  const { user } = userCtx
 
   return (
     <Box w="full">
