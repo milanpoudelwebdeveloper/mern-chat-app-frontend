@@ -7,7 +7,6 @@ import {
   TabPanels,
   Tabs,
   Text,
-  useToast,
 } from '@chakra-ui/react'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -19,16 +18,10 @@ import { ChatContext } from '../Context/ChatProvider'
 const Home: NextPage = () => {
   const router = useRouter()
   const { user } = useContext(ChatContext)
-  const toast = useToast()
+
   useEffect(() => {
     if (user) {
       router.push('/chats')
-      toast({
-        title: 'Already logged in',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
     }
   }, [router.isReady, user])
   return (

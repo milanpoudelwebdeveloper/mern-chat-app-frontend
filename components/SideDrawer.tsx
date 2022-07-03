@@ -10,7 +10,18 @@ import {
   MenuList,
   MenuItem,
   MenuDivider,
+  Drawer,
+  useDisclosure,
+  DrawerOverlay,
+  DrawerContent,
+  Input,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerBody,
+  useToast,
 } from '@chakra-ui/react'
+import axios from 'axios'
 import React, { useContext, useState } from 'react'
 import { ChatContext, IUser } from '../Context/ChatProvider'
 import ProfileModal from './ProfileModal'
@@ -21,13 +32,53 @@ const SideDrawer = () => {
   const [loading, setLoading] = useState(false)
   const [loadingChat, setLoadingChat] = useState(false)
 
-  console.log(search, searchResult, loadingChat, loading)
+  console.log(loading, loadingChat, setLoadingChat)
 
-  console.log(setSearch, setSearchResult, setLoading, setLoadingChat)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const toast = useToast()
+
+  console.log(searchResult)
 
   const userCtx = useContext(ChatContext)
 
   const { user, logOut } = userCtx
+
+  const handleSearch = async () => {
+    if (search === '') {
+      toast({
+        title: 'Search field is empty',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-left',
+      })
+      return
+    }
+    try {
+      setLoading(true)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user && user.token}`,
+        },
+      }
+      const { data } = await axios.get(
+        `http://localhost:8000/api/allusers?keyword=${search}`,
+        config
+      )
+      setLoading(false)
+      setSearchResult(data)
+    } catch (e) {
+      console.log(e)
+      toast({
+        title: 'Something went wrong',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'top-left',
+      })
+    }
+  }
 
   return (
     <>
@@ -40,7 +91,7 @@ const SideDrawer = () => {
         padding="5px 10px 5px 10px"
       >
         <Tooltip label="Search Users to chat" hasArrow placement="bottom-end">
-          <Button variant="ghost">
+          <Button variant="ghost" onClick={onOpen}>
             <SearchIcon />
             <Text display={{ base: 'none', md: 'flex' }} p="4">
               Search User
@@ -68,6 +119,31 @@ const SideDrawer = () => {
             </MenuList>
           </Menu>
         </Box>
+        <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader>Search Users</DrawerHeader>
+
+            <DrawerBody>
+              <Box display="flex" pb="2">
+                <Input
+                  placeholder="Type here..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  mr={2}
+                />
+                <Button onClick={handleSearch}>Go</Button>
+              </Box>
+            </DrawerBody>
+
+            <DrawerFooter>
+              <Button variant="outline" mr={3} onClick={onClose}>
+                Cancel
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       </Box>
     </>
   )

@@ -37,6 +37,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     router.push('/')
   }
 
+  console.log('Chat provider is running')
+
   useEffect(() => {
     const storedUser = localStorage.getItem('chatUserInfo')
     let userInfo: IUser | null = null
