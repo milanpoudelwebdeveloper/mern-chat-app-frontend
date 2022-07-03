@@ -20,6 +20,7 @@ import {
   DrawerFooter,
   DrawerBody,
   useToast,
+  Spinner,
 } from '@chakra-ui/react'
 import axios from 'axios'
 import React, { useContext, useState } from 'react'
@@ -33,9 +34,6 @@ const SideDrawer = () => {
   const [searchResult, setSearchResult] = useState([])
   const [loading, setLoading] = useState(false)
   const [loadingChat, setLoadingChat] = useState(false)
-
-  console.log(loading, loadingChat, setLoadingChat)
-
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const toast = useToast()
@@ -44,7 +42,7 @@ const SideDrawer = () => {
 
   const userCtx = useContext(ChatContext)
 
-  const { user, logOut } = userCtx
+  const { user, logOut, setSelectedChat } = userCtx
 
   const handleSearch = async () => {
     if (search === '') {
@@ -95,9 +93,19 @@ const SideDrawer = () => {
         { userId },
         config
       )
-      console.log('check the chat data', data)
+      setLoadingChat(false)
+      setSelectedChat(data)
+      onClose()
     } catch (e) {
       console.log(e)
+      toast({
+        title: 'Something went wrong while setting up chat',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+        position: 'bottom-left',
+      })
+      setLoadingChat(false)
     }
   }
 
@@ -165,6 +173,7 @@ const SideDrawer = () => {
                     key={user._id}
                   />
                 ))}
+              {loadingChat && <Spinner ml="auto" display="flex" />}
             </DrawerBody>
 
             <DrawerFooter>

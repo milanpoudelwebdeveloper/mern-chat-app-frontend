@@ -9,7 +9,6 @@ import { ChatContext } from '../Context/ChatProvider'
 const Chats: NextPage = () => {
   const userCtx = useContext(ChatContext)
   const { user } = userCtx
-
   return (
     <Box w="full">
       {user && <SideDrawer />}

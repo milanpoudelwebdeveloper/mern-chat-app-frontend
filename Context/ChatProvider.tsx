@@ -12,18 +12,23 @@ export interface userContextInterface {
   user: IUser | null
   login: (_: IUser) => void
   logOut: () => void
+  selectedChat: any
+  setSelectedChat: (_: any) => void
 }
 
 const intialContext: userContextInterface = {
   user: null,
   login: (_: IUser) => null,
   logOut: () => null,
+  selectedChat: {},
+  setSelectedChat: (_: any) => null,
 }
 
 export const ChatContext = createContext<userContextInterface>(intialContext)
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null)
+  const [selectedChat, setSelectedChat] = useState<any>(undefined)
   const router = useRouter()
 
   const loginUser = (userInfo: IUser) => {
@@ -56,6 +61,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         user,
         login: loginUser,
         logOut: logOut,
+        selectedChat,
+        setSelectedChat,
       }}
     >
       {children}
