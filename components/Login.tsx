@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   Button,
   FormControl,
@@ -12,6 +12,7 @@ import {
 
 import axios from 'axios'
 import { useRouter } from 'next/router'
+import { ChatContext } from '../Context/ChatProvider'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -22,6 +23,8 @@ const Login = () => {
   const router = useRouter()
 
   const toast = useToast()
+  const { login } = useContext(ChatContext)
+
   const loginHandler = async () => {
     setLoading(true)
     if (!email || !password) {
@@ -52,6 +55,7 @@ const Login = () => {
       })
       localStorage.setItem('chatUserInfo', JSON.stringify(data))
       setLoading(false)
+      login(data)
       router.push('/chats')
     } catch (e: any) {
       console.log(e)

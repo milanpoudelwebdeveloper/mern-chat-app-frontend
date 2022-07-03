@@ -1,10 +1,5 @@
 import { useRouter } from 'next/router'
-import React, {
-  createContext,
-  ReactNode,
-  useEffect,
-  useState,
-} from 'react'
+import React, { createContext, ReactNode, useEffect, useState } from 'react'
 
 export interface IUser {
   name: string
@@ -27,7 +22,7 @@ const intialContext: userContextInterface = {
   logOut: () => null,
 }
 
-const ChatContext = createContext<userContextInterface>(intialContext)
+export const ChatContext = createContext<userContextInterface>(intialContext)
 
 const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null)
@@ -37,21 +32,23 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const loginUser = (userInfo: IUser) => {
     setUser(userInfo)
     setIsLoggedIn(true)
-    localStorage.setItem('user', JSON.stringify(userInfo))
+    localStorage.setItem('chatUserInfo', JSON.stringify(userInfo))
   }
 
   const logOut = () => {
     setIsLoggedIn(false)
+    localStorage.removeItem('chatUserInfo')
     setUser(null)
+    console.log('logging out')
   }
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
+    const user = localStorage.getItem('chatUserInfo')
     let userInfo: IUser | null = null
-    if (user) userInfo = JSON.parse(localStorage.getItem('user') || '')
+    if (user) userInfo = JSON.parse(localStorage.getItem('chatUserInfo') || '')
     setUser(userInfo)
     setIsLoggedIn(true)
-    if (!userInfo) {
+    if (!isLoggedIn) {
       router.push('/')
     }
   }, [router])
