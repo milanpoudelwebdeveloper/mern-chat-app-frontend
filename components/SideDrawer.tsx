@@ -82,6 +82,25 @@ const SideDrawer = () => {
     }
   }
 
+  const openChat = async (userId: string) => {
+    try {
+      setLoadingChat(true)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user && user.token}`,
+        },
+      }
+      const { data } = await axios.post(
+        `http://localhost:8000/api/chat`,
+        { userId },
+        config
+      )
+      console.log('check the chat data', data)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   return (
     <>
       <Box
@@ -142,7 +161,7 @@ const SideDrawer = () => {
                 searchResult.map((user: any) => (
                   <UserListItem
                     user={user}
-                    openChat={() => {}}
+                    openChat={() => openChat(user._id)}
                     key={user._id}
                   />
                 ))}
