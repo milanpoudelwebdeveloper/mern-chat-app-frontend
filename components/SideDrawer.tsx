@@ -9,9 +9,11 @@ import {
   Avatar,
   MenuList,
   MenuItem,
+  MenuDivider,
 } from '@chakra-ui/react'
 import React, { useContext, useState } from 'react'
-import { ChatContext } from '../Context/ChatProvider'
+import { ChatContext, IUser } from '../Context/ChatProvider'
+import ProfileModal from './ProfileModal'
 
 const SideDrawer = () => {
   const [search, setSearch] = useState('')
@@ -55,11 +57,15 @@ const SideDrawer = () => {
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
               <Avatar size="sm" cursor="pointer" name={user?.name} />
-              <MenuList>
-                <MenuItem>My Profile</MenuItem>
-                <MenuItem onClick={logOut}>Log out</MenuItem>
-              </MenuList>
             </MenuButton>
+
+            <MenuList>
+              <ProfileModal user={user as IUser}>
+                <MenuItem>My Profile</MenuItem>
+              </ProfileModal>
+              <MenuDivider />
+              <MenuItem onClick={logOut}>Log out</MenuItem>
+            </MenuList>
           </Menu>
         </Box>
       </Box>
