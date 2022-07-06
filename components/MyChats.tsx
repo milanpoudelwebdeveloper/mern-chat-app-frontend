@@ -1,34 +1,27 @@
 import React, { useContext, useEffect } from 'react'
 import { ChatContext, IUser } from '../Context/ChatProvider'
 import { Box, Button, Stack, useToast, Text } from '@chakra-ui/react'
-import axios from 'axios'
 import { AddIcon } from '@chakra-ui/icons'
 import { getSender } from '../utils/getSender'
 import GroupChatModal from './GroupChatModal'
-
+import { fetchChats } from '../apiFunctions/fetchChats'
 const MyChats = () => {
   const userCtx = useContext(ChatContext)
-  const { user, selectedChat, setSelectedChat, chats, setChats } = userCtx
+  const { user, selectedChat, setSelectedChat, chats, setChats, chatStatus } =
+    userCtx
   const toast = useToast()
 
   useEffect(() => {
     if (!user) {
       return
     }
-    fetchChats()
-  }, [user])
+    fetchAllChats()
+  }, [user, chatStatus])
 
-  const fetchChats = async () => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user && user.token}`,
-      },
-    }
+  const fetchAllChats = async () => {
     try {
-      const { data } = await axios.get(
-        `http://localhost:8000/api/chats`,
-        config
-      )
+      const { data } = await fetchChats(user?.token as string)
+      console.log('data from api', data)
       setChats(data)
     } catch (e) {
       console.log(e)
@@ -41,6 +34,9 @@ const MyChats = () => {
       })
     }
   }
+
+  console.log('chats after fetching', chats)
+
   //we want to display only chat box in mobile version to make it responsive when users click on any results
   //to start chat
   return (
@@ -85,7 +81,7 @@ const MyChats = () => {
       >
         {chats.length > 0 && (
           <Stack overflow="scroll">
-            {chats.map((chat: any) => (
+            {chats.map((chat: any, index) => (
               <Box
                 onClick={() => setSelectedChat(chat)}
                 bg={selectedChat === chat ? '#38B2AC' : '#E8E8E8'}
@@ -93,7 +89,7 @@ const MyChats = () => {
                 px={3}
                 py={2}
                 borderRadius="lg"
-                key={chat._id}
+                key={index}
               >
                 <Text>
                   {!chat.isGroupChat

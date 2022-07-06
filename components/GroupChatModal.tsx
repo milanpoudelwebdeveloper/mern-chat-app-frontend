@@ -85,7 +85,7 @@ const GroupChatModal: React.FC<{ children: ReactNode }> = ({ children }) => {
       )
       onClose()
       //here data is an single object but in context provider, we need to pass array that's why we do this
-      setChats([data])
+      setChats((prevData: any) => [data, ...prevData])
       toast({
         title: 'Group chat created successfully',
         status: 'success',
