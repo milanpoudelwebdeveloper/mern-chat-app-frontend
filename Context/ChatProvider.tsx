@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { createContext, ReactNode, useEffect, useState } from 'react'
+import { HOME } from '../constants/routes'
 
 export interface IUser {
   name: string
@@ -17,7 +18,9 @@ export interface userContextInterface {
   selectedChat: any
   setSelectedChat: (_: any) => void
   chats: []
-  setChats: (_: any) => void
+  setChats: React.Dispatch<any>
+  refreshChats: React.Dispatch<any>
+  chatStatus: boolean
 }
 
 const intialContext: userContextInterface = {
@@ -27,7 +30,9 @@ const intialContext: userContextInterface = {
   selectedChat: {},
   setSelectedChat: (_: any) => null,
   chats: [],
-  setChats: (_: any) => null,
+  setChats: () => null,
+  refreshChats: () => null,
+  chatStatus: false,
 }
 
 export const ChatContext = createContext<userContextInterface>(intialContext)
@@ -36,6 +41,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null)
   const [selectedChat, setSelectedChat] = useState<any>(undefined)
   const [chats, setChats] = useState<any>([])
+  const [refreshChats, setRefreshChats] = useState(false)
+
   const router = useRouter()
 
   const loginUser = (userInfo: IUser) => {
@@ -46,14 +53,8 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const logOut = () => {
     localStorage.removeItem('chatUserInfo')
     setUser(null)
-    router.push('/')
+    router.push(HOME)
   }
-
-  const addToChats = (chatData: any) => {
-    setChats((prevData: any) => [...chatData, ...prevData])
-  }
-
-  console.log('check your chat datas in the context api', chats)
 
   useEffect(() => {
     const storedUser = localStorage.getItem('chatUserInfo')
@@ -62,7 +63,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       userInfo = JSON.parse(localStorage.getItem('chatUserInfo') || '')
       setUser(userInfo)
     } else {
-      router.push('/')
+      router.push(HOME)
     }
   }, [router.isReady])
 
@@ -75,7 +76,9 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         selectedChat,
         setSelectedChat,
         chats,
-        setChats: addToChats,
+        setChats: setChats,
+        refreshChats: setRefreshChats,
+        chatStatus: refreshChats,
       }}
     >
       {children}

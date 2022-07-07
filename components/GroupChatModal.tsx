@@ -8,14 +8,16 @@ import {
   ModalHeader,
   ModalOverlay,
   ModalCloseButton,
-  useToast,
   FormControl,
   Input,
   Box,
 } from '@chakra-ui/react'
-import axios from 'axios'
+
 import React, { ReactNode, useContext, useState } from 'react'
+import { createGroupChat } from '../apiFunctions/groupChat'
+import { searchUsers } from '../apiFunctions/searchUsers'
 import { ChatContext, IUser } from '../Context/ChatProvider'
+import { useCustomToast } from '../hooks/useCustomToast'
 import UserBadgeItem from './UserBadgeItem'
 import UserListItem from './UserListItem'
 
@@ -26,9 +28,7 @@ const GroupChatModal: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [search, setSearch] = useState('')
   const [searchResults, setSearchResults] = useState<any>([])
   const [loading, setLoading] = useState(false)
-
-  const toast = useToast()
-
+  const { showToast } = useCustomToast()
   const { user, setChats } = useContext(ChatContext)
 
   const handleSearch = async (value: string) => {
@@ -38,15 +38,7 @@ const GroupChatModal: React.FC<{ children: ReactNode }> = ({ children }) => {
     } else {
       try {
         setLoading(true)
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user && user.token}`,
-          },
-        }
-        const { data } = await axios.get(
-          `http://localhost:8000/api/allusers?keyword=${search}`,
-          config
-        )
+        const { data } = await searchUsers(user?.token as string, search)
         setSearchResults(data)
         setLoading(false)
       } catch (e) {
@@ -59,49 +51,26 @@ const GroupChatModal: React.FC<{ children: ReactNode }> = ({ children }) => {
   //
   const handleSubmit = async () => {
     if (groupChatName === '' || selectedUsers.length < 2) {
-      toast({
-        title: 'Please enter a group chat name and select at least 2 users',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'top',
-      })
+      showToast(
+        'Please enter a group chat name and select at least 2 users',
+        'warning'
+      )
       return
     }
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user && user.token}`,
-      },
-    }
     try {
-      const { data } = await axios.post(
-        'http://localhost:8000/api/groupChats',
-        {
-          groupName: groupChatName,
-          //we are going to stringify and send the users id by filteting them
-          users: JSON.stringify(selectedUsers.map((user: IUser) => user._id)),
-        },
-        config
-      )
+      const groupData = {
+        groupName: groupChatName,
+        //we are going to stringify and send the users id by filteting them
+        users: JSON.stringify(selectedUsers.map((user: IUser) => user._id)),
+      }
+      const { data } = await createGroupChat(user?.token as string, groupData)
       onClose()
       //here data is an single object but in context provider, we need to pass array that's why we do this
-      setChats([data])
-      toast({
-        title: 'Group chat created successfully',
-        status: 'success',
-        duration: 4000,
-        isClosable: true,
-        position: 'top',
-      })
+      setChats((prevData: any) => [data, ...prevData])
+      showToast('Group chat created successfully', 'success')
     } catch (e) {
       console.log(e)
-      toast({
-        title: 'Something went wrong while creating group chat',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'top',
-      })
+      showToast('Group chat creation failed', 'error')
     }
   }
 
@@ -118,13 +87,7 @@ const GroupChatModal: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const selectUser = (user: IUser) => {
     if (selectedUsers.includes(user)) {
-      toast({
-        title: 'User already added',
-        status: 'error',
-        duration: 2000,
-        isClosable: true,
-        position: 'top',
-      })
+      showToast('User already added', 'warning')
       return
     }
     const newSelectedUser = [...selectedUsers]

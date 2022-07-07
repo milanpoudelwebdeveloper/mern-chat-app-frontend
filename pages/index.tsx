@@ -13,6 +13,7 @@ import { useRouter } from 'next/router'
 import React, { useContext, useEffect } from 'react'
 import Login from '../components/Login'
 import SignUp from '../components/SignUp'
+import { CHATS } from '../constants/routes'
 import { ChatContext } from '../Context/ChatProvider'
 
 const Home: NextPage = () => {
@@ -21,7 +22,7 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (user) {
-      router.push('/chats')
+      router.push(CHATS)
     }
   }, [router.isReady, user])
   return (

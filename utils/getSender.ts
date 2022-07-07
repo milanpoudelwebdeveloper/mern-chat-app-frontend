@@ -4,3 +4,7 @@ import { IUser } from '../Context/ChatProvider'
 export const getSender = (loggedUser: IUser, users: IUser[]) => {
   return users.filter((user: IUser) => user._id !== loggedUser._id)[0].name
 }
+
+export const getUserFullInfo = (loggedUser: IUser, users: IUser[]) => {
+  return users.filter((user: IUser) => user._id !== loggedUser._id)[0]
+}

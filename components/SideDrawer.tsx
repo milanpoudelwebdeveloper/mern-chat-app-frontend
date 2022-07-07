@@ -19,12 +19,13 @@ import {
   DrawerHeader,
   DrawerFooter,
   DrawerBody,
-  useToast,
   Spinner,
 } from '@chakra-ui/react'
-import axios from 'axios'
 import React, { useContext, useState } from 'react'
+import { createChat } from '../apiFunctions/createChat'
+import { searchUsers } from '../apiFunctions/searchUsers'
 import { ChatContext, IUser } from '../Context/ChatProvider'
+import { useCustomToast } from '../hooks/useCustomToast'
 import ProfileModal from './ProfileModal'
 import SearchLoading from './SearchLoading'
 import UserListItem from './UserListItem'
@@ -36,7 +37,7 @@ const SideDrawer = () => {
   const [loadingChat, setLoadingChat] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   const userCtx = useContext(ChatContext)
 
@@ -44,65 +45,30 @@ const SideDrawer = () => {
 
   const handleSearch = async () => {
     if (search === '') {
-      toast({
-        title: 'Search field is empty',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'top-left',
-      })
+      showToast('Search field is empty', 'error')
       return
     }
     try {
       setLoading(true)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user && user.token}`,
-        },
-      }
-      const { data } = await axios.get(
-        `http://localhost:8000/api/allusers?keyword=${search}`,
-        config
-      )
+      const { data } = await searchUsers(user?.token as string, search)
       setLoading(false)
       setSearchResult(data)
     } catch (e) {
       console.log(e)
-      toast({
-        title: 'Something went wrong',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'top-left',
-      })
+      showToast('Something went wrong', 'error')
     }
   }
 
   const openChat = async (userId: string) => {
     try {
       setLoadingChat(true)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user && user.token}`,
-        },
-      }
-      const { data } = await axios.post(
-        `http://localhost:8000/api/chat`,
-        { userId },
-        config
-      )
+      const { data } = await createChat(user?.token as string, { userId })
       setLoadingChat(false)
       setSelectedChat(data)
       onClose()
     } catch (e) {
       console.log(e)
-      toast({
-        title: 'Something went wrong while setting up chat',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'bottom-left',
-      })
+      showToast('Something went wrong while setting up chat', 'error')
       setLoadingChat(false)
     }
   }

@@ -18,13 +18,12 @@ import React, { ReactNode } from 'react'
 import { IUser } from '../Context/ChatProvider'
 
 interface props {
-  children: ReactNode
+  children?: ReactNode
   user: IUser
 }
 
 const ProfileModal: React.FC<props> = ({ children, user }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-
   const { name, email, pic } = user
   return (
     <Box>
