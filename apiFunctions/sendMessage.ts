@@ -13,7 +13,7 @@ export const sendSingleMessage = async (
     },
   }
   return await axios.post(
-    `${process.env.NEXT_PUBLIC_API}/sendMessage`,
+    `${process.env.NEXT_PUBLIC_API}/message`,
     messageData,
     config
   )

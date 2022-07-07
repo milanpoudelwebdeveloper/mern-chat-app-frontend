@@ -21,6 +21,8 @@ import UpdateGroupChatModal from './UpdateGroupChatModal'
 const SingleChat = () => {
   const { selectedChat, setSelectedChat, user } = useContext(ChatContext)
 
+  console.log(user)
+
   const senderName =
     selectedChat && getSender(user as IUser, selectedChat.users)
 
@@ -42,8 +44,8 @@ const SingleChat = () => {
     try {
       setLoading(true)
       const { data } = await fetchMessages(
-        user?.token as string,
-        selectedChat._id
+        selectedChat._id,
+        user?.token as string
       )
       setMessages(data)
       setLoading(false)
