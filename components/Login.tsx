@@ -13,6 +13,7 @@ import { login as logIn } from '../apiFunctions/login'
 import { useRouter } from 'next/router'
 import { ChatContext } from '../Context/ChatProvider'
 import { useCustomToast } from '../hooks/useCustomToast'
+import { CHATS } from '../constants/routes'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -42,7 +43,7 @@ const Login = () => {
       localStorage.setItem('chatUserInfo', JSON.stringify(data))
       setLoading(false)
       login(data)
-      router.push('/chats')
+      router.push(CHATS)
     } catch (e: any) {
       console.log(e)
       showToast(e.response.data, 'error')

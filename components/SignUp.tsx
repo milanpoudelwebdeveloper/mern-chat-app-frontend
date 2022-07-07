@@ -15,6 +15,7 @@ import { ChatContext } from '../Context/ChatProvider'
 import { register } from '../apiFunctions/register'
 import { useCustomToast } from '../hooks/useCustomToast'
 import { postPic as uploadPic } from '../apiFunctions/postPic'
+import { CHATS } from '../constants/routes'
 
 const SignUp = () => {
   const [name, setName] = useState('')
@@ -76,7 +77,7 @@ const SignUp = () => {
       if (data) {
         localStorage.setItem('chatUserInfo', JSON.stringify(data))
         login(data)
-        router.push('/chats')
+        router.push(CHATS)
       }
       setLoading(false)
     } catch (e: any) {

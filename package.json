@@ -8,6 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "heroku-postbuild": "npm run build",
     "lint": "next lint",
     "check-types": "tsc --pretty --noEmit",
     "check-lint": "eslint . --ext ts --ext tsx --ext js",

@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import React, { createContext, ReactNode, useEffect, useState } from 'react'
+import { HOME } from '../constants/routes'
 
 export interface IUser {
   name: string
@@ -52,7 +53,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const logOut = () => {
     localStorage.removeItem('chatUserInfo')
     setUser(null)
-    router.push('/')
+    router.push(HOME)
   }
 
   useEffect(() => {
@@ -62,7 +63,7 @@ const ChatProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       userInfo = JSON.parse(localStorage.getItem('chatUserInfo') || '')
       setUser(userInfo)
     } else {
-      router.push('/')
+      router.push(HOME)
     }
   }, [router.isReady])
 
