@@ -6,11 +6,13 @@ import {
   Input,
   Spinner,
   Text,
-  useToast,
 } from '@chakra-ui/react'
-import axios from 'axios'
+
 import React, { useContext, useEffect, useState } from 'react'
+import { fetchMessages } from '../apiFunctions/getMessages'
+import { sendSingleMessage } from '../apiFunctions/sendMessage'
 import { ChatContext, IUser } from '../Context/ChatProvider'
+import { useCustomToast } from '../hooks/useCustomToast'
 import { getSender, getUserFullInfo } from '../utils/getSender'
 import ProfileModal from './ProfileModal'
 import ScrollableChat from './ScrollableChat'
@@ -29,7 +31,7 @@ const SingleChat = () => {
   const [loading, setLoading] = useState(false)
   const [newMessage, setNewMessage] = useState('')
 
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   useEffect(() => {
     fetchAllMessages()
@@ -39,27 +41,15 @@ const SingleChat = () => {
     if (!selectedChat) return
     try {
       setLoading(true)
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user && user.token}`,
-        },
-      }
-      const { data } = await axios.get(
-        `http://localhost:8000/api/messages/${selectedChat._id}`,
-        config
+      const { data } = await fetchMessages(
+        user?.token as string,
+        selectedChat._id
       )
-
-      console.log('ypir data messages', data)
       setMessages(data)
       setLoading(false)
     } catch (e) {
       console.log(e)
-      toast({
-        title: 'Somthing went wrong while fetching messages',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
+      showToast('Somthing went wrong while fetching messages', 'error')
       setLoading(false)
     }
   }
@@ -67,30 +57,15 @@ const SingleChat = () => {
   const sendMessage = async (event: any) => {
     if (event.key === 'Enter' && newMessage !== '') {
       try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user && user.token}`,
-          },
-        }
-        const { data } = await axios.post(
-          'http://localhost:8000/api/message',
-          {
-            chatId: selectedChat && selectedChat._id,
-            content: newMessage,
-          },
-          config
-        )
+        const { data } = await sendSingleMessage(user?.token as string, {
+          chatId: selectedChat && selectedChat._id,
+          content: newMessage,
+        })
         setNewMessage('')
         setMessages([...messages, data])
       } catch (e: any) {
         console.log(e)
-        toast({
-          title: e.response.data,
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
-        })
+        showToast(e.response.data, 'error')
       }
     }
   }
@@ -99,7 +74,6 @@ const SingleChat = () => {
     setNewMessage(message)
   }
 
-  console.log('messages are', messages)
   return (
     <>
       {selectedChat ? (

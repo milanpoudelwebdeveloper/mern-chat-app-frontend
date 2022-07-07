@@ -6,13 +6,13 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  useToast,
   VStack,
 } from '@chakra-ui/react'
 
-import axios from 'axios'
+import { login as logIn } from '../apiFunctions/login'
 import { useRouter } from 'next/router'
 import { ChatContext } from '../Context/ChatProvider'
+import { useCustomToast } from '../hooks/useCustomToast'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -21,49 +21,31 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const toast = useToast()
   const { login } = useContext(ChatContext)
+
+  const { showToast } = useCustomToast()
 
   const loginHandler = async () => {
     setLoading(true)
     if (!email || !password) {
-      toast({
-        title: 'Please fill all the fields',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      })
+      showToast('Please enter your email and password', 'warning')
       setLoading(false)
       return
     }
-
     const loginInfo = {
       email,
       password,
     }
     try {
-      const { data } = await axios.post(
-        'http://localhost:8000/api/login',
-        loginInfo
-      )
-      toast({
-        title: 'Logged in successfully',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      })
+      const { data } = await logIn(loginInfo)
+      showToast('Log in successfully', 'success')
       localStorage.setItem('chatUserInfo', JSON.stringify(data))
       setLoading(false)
       login(data)
       router.push('/chats')
     } catch (e: any) {
       console.log(e)
-      toast({
-        title: e.response.data,
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      })
+      showToast(e.response.data, 'error')
       setLoading(false)
     }
   }

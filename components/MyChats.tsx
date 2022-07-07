@@ -1,15 +1,17 @@
 import React, { useContext, useEffect } from 'react'
 import { ChatContext, IUser } from '../Context/ChatProvider'
-import { Box, Button, Stack, useToast, Text } from '@chakra-ui/react'
+import { Box, Button, Stack, Text } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { getSender } from '../utils/getSender'
 import GroupChatModal from './GroupChatModal'
 import { fetchChats } from '../apiFunctions/fetchChats'
+import { useCustomToast } from '../hooks/useCustomToast'
+
 const MyChats = () => {
   const userCtx = useContext(ChatContext)
   const { user, selectedChat, setSelectedChat, chats, setChats, chatStatus } =
     userCtx
-  const toast = useToast()
+  const { showToast } = useCustomToast()
 
   useEffect(() => {
     if (!user) {
@@ -21,21 +23,12 @@ const MyChats = () => {
   const fetchAllChats = async () => {
     try {
       const { data } = await fetchChats(user?.token as string)
-      console.log('data from api', data)
       setChats(data)
     } catch (e) {
       console.log(e)
-      toast({
-        title: 'Something went wrong while fetching chats',
-        status: 'error',
-        duration: 4000,
-        isClosable: true,
-        position: 'top-left',
-      })
+      showToast('Something went wrong while fetching chats', 'error')
     }
   }
-
-  console.log('chats after fetching', chats)
 
   //we want to display only chat box in mobile version to make it responsive when users click on any results
   //to start chat

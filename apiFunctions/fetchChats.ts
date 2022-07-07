@@ -6,5 +6,5 @@ export const fetchChats = async (userToken: string) => {
       Authorization: `Bearer ${userToken}`,
     },
   }
-  return await axios.get(`http://localhost:8000/api/chats`, config)
+  return await axios.get(`${process.env.NEXT_PUBLIC_API}/chats`, config)
 }

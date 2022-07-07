@@ -8,11 +8,13 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import React, { useContext, useState } from 'react'
-import { useToast } from '@chakra-ui/react'
-import axios from 'axios'
+
 import Resizer from 'react-image-file-resizer'
 import { useRouter } from 'next/router'
 import { ChatContext } from '../Context/ChatProvider'
+import { register } from '../apiFunctions/register'
+import { useCustomToast } from '../hooks/useCustomToast'
+import { postPic as uploadPic } from '../apiFunctions/postPic'
 
 const SignUp = () => {
   const [name, setName] = useState('')
@@ -22,7 +24,7 @@ const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [pic, setPic] = useState('')
   const [loading, setLoading] = useState(false)
-  const toast = useToast()
+  const { showToast } = useCustomToast()
   const router = useRouter()
 
   const { login } = useContext(ChatContext)
@@ -31,24 +33,14 @@ const SignUp = () => {
     console.log('file is', file)
     setLoading(true)
     if (!file) {
-      toast({
-        title: 'Please select an image',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      })
+      showToast('Please select an image', 'warning')
       return
     }
     if (file.type === 'image/jpeg' || file.type === 'image/png') {
       Resizer.imageFileResizer(file, 720, 720, 'JPEG', 100, 0, async (uri) => {
         try {
-          const response = await axios.post(
-            'http://localhost:8000/api/uploadImage',
-            {
-              image: uri,
-            }
-          )
-          setPic(response.data.url)
+          const { data } = await uploadPic(uri)
+          setPic(data.url)
           setLoading(false)
         } catch (e) {
           setLoading(false)
@@ -56,12 +48,7 @@ const SignUp = () => {
         }
       })
     } else {
-      toast({
-        title: 'Please select an appropriate image',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-      })
+      showToast('Please select a valid image', 'warning')
       return
     }
   }
@@ -69,22 +56,12 @@ const SignUp = () => {
   const submitHandler = async () => {
     setLoading(true)
     if (name === '' || email === '' || password === '') {
-      toast({
-        title: 'Please fill all the fields',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      })
+      showToast('Please enter all the fields', 'warning')
       setLoading(false)
       return
     }
     if (password !== confirmPassword) {
-      toast({
-        title: 'Passwords do not match',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      })
+      showToast('Passwords do not match', 'warning')
       setLoading(false)
       return
     }
@@ -95,10 +72,7 @@ const SignUp = () => {
       pic,
     }
     try {
-      const { data } = await axios.post(
-        'http://localhost:8000/api/register',
-        userData
-      )
+      const { data } = await register(userData)
       if (data) {
         localStorage.setItem('chatUserInfo', JSON.stringify(data))
         login(data)
@@ -106,12 +80,7 @@ const SignUp = () => {
       }
       setLoading(false)
     } catch (e: any) {
-      toast({
-        title: e.response.data,
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      })
+      showToast(e.response.data, 'error')
       setLoading(false)
     }
   }
