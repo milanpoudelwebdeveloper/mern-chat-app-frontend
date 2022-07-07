@@ -13,6 +13,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { ChatContext, IUser } from '../Context/ChatProvider'
 import { getSender, getUserFullInfo } from '../utils/getSender'
 import ProfileModal from './ProfileModal'
+import ScrollableChat from './ScrollableChat'
 import UpdateGroupChatModal from './UpdateGroupChatModal'
 
 const SingleChat = () => {
@@ -158,7 +159,9 @@ const SingleChat = () => {
                 flexDir="column"
                 overflowY="scroll"
                 style={{ scrollbarWidth: 'none' }}
-              ></Box>
+              >
+                <ScrollableChat messages={messages} />
+              </Box>
             )}
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
               <Input
