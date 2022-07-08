@@ -8,7 +8,8 @@ import {
   Text,
 } from '@chakra-ui/react'
 
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
+import { useQuery } from 'react-query'
 import { fetchMessages } from '../apiFunctions/getMessages'
 import { sendSingleMessage } from '../apiFunctions/sendMessage'
 import { ChatContext, IUser } from '../Context/ChatProvider'
@@ -29,31 +30,59 @@ const SingleChat = () => {
   const senderFullInfo =
     selectedChat && getUserFullInfo(user as IUser, selectedChat.users)
 
+  //without react query
   const [messages, setMessages] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
+  // const [loading, setLoading] = useState(false)
   const [newMessage, setNewMessage] = useState('')
 
   const { showToast } = useCustomToast()
 
-  useEffect(() => {
-    fetchAllMessages()
-  }, [selectedChat])
+  //without react-query
+  // useEffect(() => {
+  //   fetchAllMessages()
+  // }, [selectedChat])
+
+  //without react-query
+  // const fetchAllMessages = async () => {
+  //   if (!selectedChat) return
+  //   try {
+  //     setLoading(true)
+  //     const { data } = await fetchMessages(
+  //       selectedChat._id,
+  //       user?.token as string
+  //     )
+  //     setMessages(data)
+  //     setLoading(false)
+  //   } catch (e) {
+  //     console.log(e)
+  //     showToast('Somthing went wrong while fetching messages', 'error')
+  //     setLoading(false)
+  //   }
+  // }
 
   const fetchAllMessages = async () => {
-    if (!selectedChat) return
-    try {
-      setLoading(true)
-      const { data } = await fetchMessages(
-        selectedChat._id,
-        user?.token as string
-      )
-      setMessages(data)
-      setLoading(false)
-    } catch (e) {
-      console.log(e)
-      showToast('Somthing went wrong while fetching messages', 'error')
-      setLoading(false)
+    const { data } = await fetchMessages(
+      selectedChat._id,
+      user?.token as string
+    )
+    return data
+  }
+
+  const onSuccess = (data: any) => {
+    setMessages(data)
+  }
+
+  const { isLoading, error } = useQuery(
+    ['messages', selectedChat && selectedChat._id],
+    fetchAllMessages,
+    {
+      enabled: !!selectedChat,
+      onSuccess,
     }
+  )
+
+  if (error) {
+    showToast('Somthing went wrong while fetching messages', 'error')
   }
 
   const sendMessage = async (event: any) => {
@@ -64,7 +93,7 @@ const SingleChat = () => {
           content: newMessage,
         })
         setNewMessage('')
-        setMessages([...messages, data])
+        setMessages((prevData) => [...prevData, data])
       } catch (e: any) {
         console.log(e)
         showToast(e.response.data, 'error')
@@ -120,7 +149,7 @@ const SingleChat = () => {
             borderRadius="lg"
             overflowY="hidden"
           >
-            {loading && (
+            {isLoading && (
               <Spinner
                 size="xl"
                 w={20}
@@ -129,7 +158,7 @@ const SingleChat = () => {
                 alignSelf="center"
               />
             )}
-            {messages.length >= 0 && (
+            {messages?.length >= 0 && (
               <Box
                 display="flex"
                 flexDir="column"
