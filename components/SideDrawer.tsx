@@ -108,7 +108,14 @@ const SideDrawer = () => {
                 <MenuItem>My Profile</MenuItem>
               </ProfileModal>
               <MenuDivider />
-              <MenuItem onClick={() => logOut()}>Log out</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  logOut()
+                  setSelectedChat(null)
+                }}
+              >
+                Log out
+              </MenuItem>
             </MenuList>
           </Menu>
         </Box>
@@ -133,7 +140,9 @@ const SideDrawer = () => {
                 searchResult.map((user: any) => (
                   <UserListItem
                     user={user}
-                    operation={() => openChat(user._id)}
+                    operation={() => {
+                      openChat(user._id)
+                    }}
                     key={user._id}
                   />
                 ))}
